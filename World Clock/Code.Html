@@ -1,0 +1,145 @@
+<!-- Add these two pages to Page Setting -> Custom Code -> Custom Code In Document Head
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.0/moment-timezone-with-data.min.js"></script>
+-->
+<!--Sandbox Mode must be turned off-->
+<!-- Only use one of these per page-->
+
+<link href='https://fonts.googleapis.com/css?family=Lato:400,300' rel='stylesheet' type='text/css'>
+<style>
+	/* CSS */
+#body {
+    background-color: rgba(0,190,156, 0);
+		padding: 10px 0 25px 0;
+		height: 80px;
+}
+
+#left {
+    float:left;
+    margin-left: 20px;
+}
+#date {
+    min-width: 400px;
+    margin: 5px auto 5px auto;
+    font-family: "Segoe UI", "Helvetica Neue", Helvetica, sans-serif;
+    text-align: center;
+    color: white;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+#clock {
+    min-width: 400px;
+    margin: 0 auto 5 auto;
+    font-family: "Segoe UI", "Helvetica Neue", Helvetica, sans-serif;
+    text-align: center;
+    color: white;
+    font-size: 60px;
+    font-weight: 300;
+    margin-top:-15px;
+}
+
+#locList {
+    margin: auto;
+    text-align: center;
+    min-width: 400px;
+    padding: 0;
+}
+
+.locListItem {
+    display: inline;
+    margin-right: 15px;
+    color: white;
+    font-family: "Segoe UI", "Helvetica Neue", Helvetica, sans-serif;
+    text-transform: uppercase;
+    font-size: 14px;
+    padding-bottom: 3px;
+    cursor: default;
+}
+
+.locListItem:not(.active):hover {
+    color: rgba(255,255,255,0.8);
+    cursor: pointer;
+}
+
+.active {
+    border-bottom: solid white 1px;
+}
+</style>
+<!-- HTML -->
+<div id="body">
+    <div id="left">
+    <div id="date"></div>
+    
+    <ul id="locList">
+      <li id="myTime" class="active locListItem">My Time</li>
+      <!-- 
+      You can change the data-timezone attribute and element text below to any location
+      described in the map on this site http://momentjs.com/timezone/
+      -->
+        <li class="locListItem" data-timezone="America/New_York">New York</li>
+        <li class="locListItem" data-timezone="America/Los_Angeles">Seattle</li>
+        <li class="locListItem" data-timezone="Australia/Sydney">Sydney</li>
+        <li class="locListItem" data-timezone="Europe/London">London</li>
+    </ul>
+    </div>
+    <div id="clock"></div>
+</div>
+
+<script>
+// JavaScript
+$(document).ready(function () {
+
+    //runs functions to display time when active.
+	function displayTime() {
+		if($('.active').is('#myTime')){
+			getMyTime();
+		} else {
+			getTime($('.active').attr('data-timezone'));
+		}
+	}
+    
+    //gets users current time
+	function getMyTime() {
+		//Get  y date and time from the moment with correct formatting
+		var m = moment();
+		var time = m.format('hh:mm:ss A');
+		var date = m.format('dddd, MMMM Do YYYY');
+
+		//Add date and time to their divs
+		$('#clock').text(time);
+		$('#date').text(date);
+	}
+    
+    //gets time from timezone
+	function getTime(timezone) {
+		//Get  y date and time from the moment with correct formatting
+		var m = moment();
+		console.log("reached");
+		console.log("timezone:" + timezone);
+		var time = m.tz(timezone).format('hh:mm:ss A');
+		var date = m.tz(timezone).format('dddd, MMMM Do YYYY');
+
+		//Add date and time to their divs
+		$('#clock').text(time);
+		$('#date').text(date);
+	}
+
+	// Selects the button clicked and change its class to '.active'
+	$(".locListItem").click(function () {
+		// Removes the active class form the other list items
+  	$(".locListItem").removeClass("active");
+  	// Ads the active class to the clicked list item
+  	$(this).addClass("active");
+	});
+
+	// Runs the displayTime function the first time
+	displayTime();
+
+	// Makes our clock 'tick' by repeatedly
+	// running the displayTime function every second.
+  setInterval(displayTime, 500);
+});
+
+
+</script>
