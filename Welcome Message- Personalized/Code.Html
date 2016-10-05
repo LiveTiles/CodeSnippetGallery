@@ -1,0 +1,35 @@
+ <style>
+#userhello {
+ font-size: 50px;
+ }
+ </style>
+ <script type="text/javascript">
+ ExecuteOrDelayUntilScriptLoaded(init,'sp.js');
+ var currentUser;
+ function init(){
+ this.clientContext = new SP.ClientContext.get_current();
+ this.oWeb = clientContext.get_web();
+ currentUser = this.oWeb.get_currentUser();
+ this.clientContext.load(currentUser);
+ this.clientContext.executeQueryAsync(Function.createDelegate(this,this.onQuerySucceeded), Function.createDelegate(this,this.onQueryFailed));
+ }
+
+ function onQuerySucceeded() {
+ var fullname = currentUser.get_title();
+ var firstname = fullname.substr(0, fullname.indexOf(' ')); 
+
+ document.getElementById('userTitle').innerHTML = firstname;
+ }
+
+ function onQueryFailed(sender, args) {
+ alert('Request failed. \nError: ' + args.get_message() + '\nStackTrace: ' + args.get_stackTrace());
+ }
+ </script>
+ <div id="userhello">
+ <!--<span id="userLoginName"></span>
+ <span id="userId"></span>-->
+ <p>Hi there <span id="userTitle"></span>! Where do you want to go?</p>
+ <!--<span id="userEmail"></span>-->
+ </div>
+
+ 
