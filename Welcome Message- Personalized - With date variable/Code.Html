@@ -1,0 +1,50 @@
+ <!-- Code Start -->
+
+<style>
+#userhello {
+font-size: 50px;
+}
+</style>
+<script type="text/javascript">
+ExecuteOrDelayUntilScriptLoaded(init,'sp.js');
+var currentUser;
+function init(){
+this.clientContext = new SP.ClientContext.get_current();
+this.oWeb = clientContext.get_web();
+currentUser = this.oWeb.get_currentUser();
+this.clientContext.load(currentUser);
+this.clientContext.executeQueryAsync(Function.createDelegate(this,this.onQuerySucceeded), Function.createDelegate(this,this.onQueryFailed));
+}
+
+function onQuerySucceeded() {
+var fullname = currentUser.get_title();
+var firstname = fullname.substr(0, fullname.indexOf(' ')); 
+
+var d = new Date();
+var n = d.getHours();
+
+if(n => 0 && n < 12) {
+		document.getElementById('userTime').innerHTML = "Morning";
+}
+if(n => 12 && n < 17) {
+		document.getElementById('userTime').innerHTML = "Evening";
+}
+if(n => 17 && n < 23) {
+		document.getElementById('userTime').innerHTML = "Afternoon";
+}
+	
+document.getElementById('userTitle').innerHTML = firstname;
+}
+
+function onQueryFailed(sender, args) {
+alert('Request failed. \nError: ' + args.get_message() + '\nStackTrace: ' + args.get_stackTrace());
+}
+</script>
+<div id="userHello">
+<!--<span id="userLoginName"></span>
+<span id="userId"></span>-->
+<h2 style="font-family: 'Segoe UI';">Good <span id="userTime"></span>, <span id="userTitle"></span>!</h2>
+<!--<span id="userEmail"></span>-->
+</div>
+
+<!-- Code Finish -->
