@@ -1,0 +1,131 @@
+<div id="breadcrumb"></div>
+<style>
+span#pageTitleBreadcrumb a {
+    color: #fff;
+    font-size: 30px;
+    font-family: 'segoe ui light';
+}
+span.pp-breadcrumb-separator {
+    color: #fff;
+    font-size: 20px;
+}
+span#pageTitleBreadcrumb a:hover {
+text-decoration: none;
+}
+
+div#Breadcrumb {
+    font-size: 20px;
+    padding-top: 15px;
+    color: #FFF;
+}
+
+	</style>
+
+<script>
+require([],function(){
+
+var Breadcrumb = Breadcrumb || {};
+Breadcrumb.instances = Breadcrumb.instances || [];
+Breadcrumb.Load = function (element) {
+
+    AddCustomBreadcrumb();
+
+    pageProperty = "Title";
+    var currentPage = "";
+    try {
+        runCode();
+    } catch (ex) { }
+
+    function AddCustomBreadcrumb() {
+        var breadcrumbNodes = [];
+
+        breadcrumbNodes.push({
+            Title: _spPageContextInfo.webTitle,
+            Url: _spPageContextInfo.webServerRelativeUrl
+        });
+
+        function addParentNodesToBreadCrumb(webUrl) {
+            $.ajax({
+                url: webUrl + "/_api/web/parentWeb",
+                type: "GET",
+                headers: {
+                    "accept": "application/json;odata=verbose"
+                },
+                success: function (data) {
+                    if (data.d.hasOwnProperty('ParentWeb')) {
+                        renderBreadcrumb();
+                    } else {
+                        if (data.d.ServerRelativeUrl != "/") {
+                            breadcrumbNodes.push({
+                                Title: data.d.Title,
+                                Url: data.d.ServerRelativeUrl
+                            });
+                        }
+                        if (data.d.ServerRelativeUrl != "/") {
+                            addParentNodesToBreadCrumb(data.d.ServerRelativeUrl);
+                        } else {
+                            renderBreadcrumb();
+                        }
+                    }
+                },
+                error: function () { }
+            });
+        }
+
+
+        function renderBreadcrumb() {
+            $(element).prepend("<span id='pageTitleBreadcrumb'></span>");
+            if (window.location.href.toUpperCase().indexOf(_spPageContextInfo.siteServerRelativeUrl) < 0) {
+                breadcrumbNodes.push({
+                    Title: "Home",
+                    Url: "/"
+                });
+            }
+            for (var i = 0; i < breadcrumbNodes.length; i++) {
+                if (i - 1 != breadcrumbNodes.length && i != 0) {
+                    $('#pageTitleBreadcrumb').prepend("<span class='pp-breadcrumb-separator'> > </span>");
+                }
+                $('#pageTitleBreadcrumb').prepend("<a href='" + breadcrumbNodes[i].Url + "'>" + breadcrumbNodes[i].Title + "</a>");
+            }
+            
+        }
+        addParentNodesToBreadCrumb(_spPageContextInfo.webServerRelativeUrl);
+    }
+
+
+
+    var targetListItem;
+    function runCode() {
+        var clientContext = new SP.ClientContext();
+        var targetList = clientContext.get_web().get_lists().getById(_spPageContextInfo.pageListId); //change your list name here
+        targetListItem = targetList.getItemById(_spPageContextInfo.pageItemId);
+        clientContext.load(targetListItem, 'Title');
+        clientContext.executeQueryAsync(Function.createDelegate(this, this.onQuerySucceeded), Function.createDelegate(this, this.onQueryFailed));
+    }
+    function onQuerySucceeded() {
+        currentPage = targetListItem.get_item('Title');
+        if (currentPage) {
+            $(element).html(currentPage);
+
+        }
+    }
+    function onQueryFailed(sender, args) {
+        console.log('Request failed. \nError: ' + args.get_message() + '\nStackTrace: ' + args.get_stackTrace());
+    }
+
+    $(window).on("load resize", function (e) {
+        setTimeout(function () {
+            var h = $('#Breadcrumb').height();
+            $('#Breadcrumb').closest('.lt-layout-item').height(h + "px");
+        }, 100);
+        
+    });
+
+    
+}
+
+Breadcrumb.Load(document.getElementById('breadcrumb'));	
+
+
+});
+</script>
