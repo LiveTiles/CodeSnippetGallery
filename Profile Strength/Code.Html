@@ -1,0 +1,183 @@
+<script type="text/javascript">
+ExecuteOrDelayUntilScriptLoaded(init,'sp.js');
+var currentUser;
+function init(){
+this.clientContext = new SP.ClientContext.get_current();
+this.oWeb = clientContext.get_web();
+currentUser = this.oWeb.get_currentUser();
+this.clientContext.load(currentUser);
+this.clientContext.executeQueryAsync(Function.createDelegate(this,this.onQuerySucceeded), Function.createDelegate(this,this.onQueryFailed));
+}
+
+function onQuerySucceeded() {
+var fullname = currentUser.get_title();
+var firstname = fullname.substr(0, fullname.indexOf(' ')); 
+var d = new Date();
+var n = d.getHours();
+
+if(n => 0 && n < 12) {
+                            document.getElementById('userTime').innerHTML = "Good Morning ";
+}
+if(n => 12 && n < 17) {
+                            document.getElementById('userTime').innerHTML = "Good Evening ";
+}
+if(n => 17 && n < 23) {
+                            document.getElementById('userTime').innerHTML = "Good Afternoon ";
+}
+              
+document.getElementById('userTitle').innerHTML = firstname;
+}
+
+function onQueryFailed(sender, args) {
+alert('Request failed. \nError: ' + args.get_message() + '\nStackTrace: ' + args.get_stackTrace());
+}
+
+    $.ajax({  
+        url: _spPageContextInfo.webAbsoluteUrl + "/_api/SP.UserProfiles.PeopleManager/GetMyProperties",  
+        headers: { Accept: "application/json;odata=verbose" },  
+        success: function (data) {  
+                //Get properties from user profile Json response  
+                userDisplayName = data.d.DisplayName;  
+                AccountName = data.d.AccountName;  
+                var properties = data.d.UserProfileProperties.results; 
+                var count = 0;
+
+                for (var i = 0; i < properties.length; i++) {  
+                    var property = properties[i];
+									if (property.Key == "UserName" && property.Value != "") {			
+										$('.persona-image').append('<img src="/_layouts/userphoto.aspx?size=L&accountname='+property.Value+'" />')
+                    }
+                    if (property.Key == "AboutMe" && property.Value != "") {  
+                     count++;
+                     console.log(property.Value);
+                    }
+                    if (property.Key == "PictureURL" && property.Value != "") {  
+                     count++;
+                     console.log(property.Value);
+                    }
+                    if (property.Key == "SPS-Skills" && property.Value != "") {  
+                     count++;
+                     console.log(property.Value);
+                    }  
+                    if (property.Key == "CellPhone" && property.Value != "") {  
+                     count++;   
+                     console.log(property.Value);
+                    }  
+                    if (property.Key == "HomePhone" && property.Value != "") {  
+                     count++;   
+                     console.log(property.Value);
+                    }  
+                    if (property.Key == "Office" && property.Value != "") {  
+                     count++;   
+                     console.log(property.Value);
+                    }  
+                    if (property.Key == "SPS-PastProjects" && property.Value != "") {  
+                     count++;   
+                     console.log(property.Value);
+                    }  
+                    if (property.Key == "SPS-Skills" && property.Value != "") {  
+                     count++;   
+                     console.log(property.Value);
+                    }  
+                    if (property.Key == "SPS-School" && property.Value != "") {  
+                     count++;   
+                     console.log(property.Value);
+                    }  
+                    if (property.Key == "SPS-Birthday" && property.Value != "") {  
+                     count++;   
+                     console.log(property.Value);
+                    }  
+                    if (property.Key == "SPS-Interests" && property.Value != "") {  
+                     count++;   
+                     console.log(property.Value);
+                    }  
+                    
+                }  
+                
+    var bar_value = ((count/11)*100) + '%'; 
+	var b_val = ((count/11)*100);
+    $('.progress-bar').animate({ width: bar_value }, { duration: 2000, easing: 'easeOutCirc' });
+    $('.progress .progress-bar:first').addClass( (b_val < 40) ? 'bar-danger' : ( (b_val < 80) ? 'bar-warning' : 'bar-success' ) ) ;
+        
+        },  
+        error: function (jQxhr, errorCode, errorThrown) {  
+            alert(errorThrown);  
+        }  
+    });  
+</script>
+<div class="padded-wrapper">
+<div id="userHello">
+<h3><span id="userTime"></span><span id="userTitle"></span></h3>
+</div>
+	<div class="persona-image">
+</div>
+	
+<!-- Skills Progress Bar -->
+<section id="skills-pgr">
+	      <span>Profile Strength</span>
+  <div class="progress">
+    <div class="progress-bar" role="progressbar"  aria-valuemin="0" aria-valuemax="100">
+    </div>
+  </div>
+	<a target="_blank" href="https://trylivetiles-my.sharepoint.com/_layouts/15/me.aspx">Edit Profile</a>
+</section>
+	</div>
+
+<style>
+@import url('//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css');
+	.padded-wrapper{
+	padding:20px;
+	}
+section#skills-pgr {
+  padding: 3px 10px 0;
+}
+#skills-pgr div.progress {
+  font-weight: bolder;
+  color: #fff;
+  background-color: #f3f3f3;
+  border: 0px none;
+  box-shadow: none;
+  height: 2.5em;
+}
+div.progress-bar > span {
+  float: left;
+  position: relative;
+  top: 9px;
+  left: 2%;
+  font-size: 14px;
+}
+	.progress-bar.bar-success {
+    background-color: #00b6bc;
+}
+.progress-bar.bar-warning {
+    background-color: #65276a;
+}
+.progress-bar.bar-danger {
+    background-color: #201446;
+}
+
+.persona-image img{
+  width: 120px;
+  height:120px;
+  border-radius: 50%;
+  display: block;
+  margin: 20px auto 20px auto;
+	border: 4px solid #ffffff;
+}
+.persona-progress{
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+}
+.persona-greeting{
+  text-align: center;
+}
+	div#userHello {
+    text-align: center;
+}
+	.padded-wrapper{
+	color: #fff;
+	}
+</style>
+
+
